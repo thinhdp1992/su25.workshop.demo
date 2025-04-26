@@ -1,12 +1,12 @@
 
-# Orchid Image and Chat System
+# Flowers Image and Chat System
 
-This project is a full-stack application that provides functionalities for generating images, searching images, and chatting about orchids (hoa phong lan). The backend is built with **FastAPI** and utilizes machine learning models for image generation and text-image retrieval, while the frontend is developed using **ReactJS**, **Vite**, and **TailwindCSS**.
+This project is a full-stack application that provides functionalities for generating images, searching images, and chatting about flowers. The backend is built with **FastAPI** and utilizes machine learning models for image generation and text-image retrieval, while the frontend is developed using **ReactJS**, **Vite**, and **TailwindCSS**.
 
 ## Features
-1. **Image Generation**: Generate orchid images based on text prompts using Stable Diffusion.
-2. **Image Search**: Search for existing orchid images that best match a text description using CLIP.
-3. **Orchid Chatbot**: Interact with a chatbot specialized in answering questions about orchids using TinyLlama.
+1. **Image Generation**: Generate flower images based on text prompts using Stable Diffusion.
+2. **Image Search**: Search for existing flower images that best match a text description using CLIP.
+3. **Flowers Chatbot**: Interact with a chatbot specialized in answering questions about flowers using TinyLlama.
 
 ## Tech Stack
 - **Backend**: Python, FastAPI, PyTorch, Stable Diffusion, CLIP, TinyLlama
@@ -88,31 +88,31 @@ cd <repository-folder>
 ## API Endpoints
 The backend provides the following endpoints:
 1. **POST `/generate-image`**:
-   - **Request Body**: `{ "prompt": "A beautiful orchid flower" }`
+   - **Request Body**: `{ "prompt": "A beautiful flower flower" }`
    - **Response**: `{ "image_base64": "<base64-encoded-image>" }`
-   - Generates a new orchid image based on the provided text prompt.
+   - Generates a new flower image based on the provided text prompt.
 
 2. **POST `/search-image`**:
-   - **Request Body**: `{ "prompt": "A red orchid in bloom" }`
+   - **Request Body**: `{ "prompt": "A red flower in bloom" }`
    - **Response**: `{ "image_base64": "<base64-encoded-image>" }`
-   - Searches for the most similar existing orchid image based on the text prompt.
+   - Searches for the most similar existing flower image based on the text prompt.
 
-3. **POST `/chat-orchid`**:
-   - **Request Body**: `{ "history": [{ "role": "user", "content": "What is an orchid?" }, { "role": "assistant", "content": "An orchid is..." }] }`
-   - **Response**: `{ "answer": "Response about orchids" }`
-   - Interacts with the orchid-specialized chatbot.
+3. **POST `/chat-flower`**:
+   - **Request Body**: `{ "history": [{ "role": "user", "content": "What is an flower?" }, { "role": "assistant", "content": "An flower is..." }] }`
+   - **Response**: `{ "answer": "Response about flowers" }`
+   - Interacts with the flower-specialized chatbot.
 
 ## Usage
 1. **Generate an Image**:
-   - Use the frontend interface to input a text prompt (e.g., "A vibrant purple orchid").
+   - Use the frontend interface to input a text prompt (e.g., "A vibrant purple flower").
    - The generated image will be displayed as a base64-encoded string converted to an image.
 
 2. **Search for an Image**:
-   - Enter a text description in the frontend (e.g., "A white orchid with green leaves").
+   - Enter a text description in the frontend (e.g., "A white flower with green leaves").
    - The system will return the most similar image from the precomputed database.
 
-3. **Chat about Orchids**:
-   - Use the chat interface to ask questions about orchids (e.g., "How do I care for an orchid?").
+3. **Chat about Flowerss**:
+   - Use the chat interface to ask questions about flowers (e.g., "How do I care for an flower?").
    - The chatbot will respond with relevant information.
 
 ## Notes
