@@ -104,8 +104,8 @@ llm_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer)
 class ChatRequest(BaseModel):
     history: list  # List of {"role": "user"/"assistant", "content": "text"}
 
-@app.post("/chat-orchid")
-async def chat_orchid(request: ChatRequest):
+@app.post("/chat-flower")
+async def chat_flower(request: ChatRequest):
     # Build the prompt from history
     prompt = "### Instruction:\nYou are an expert on flowers. Please answer only questions about flowers carefully and helpfully.\n\n"
     for turn in request.history:

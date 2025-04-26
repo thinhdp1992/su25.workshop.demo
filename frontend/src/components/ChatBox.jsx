@@ -25,7 +25,7 @@ function ChatBox() {
         setLoading(true);
 
         try {
-            const res = await fetch(`${apiURL}/chat-orchid`, {
+            const res = await fetch(`${apiURL}/chat-flower`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ history: newHistory }),
@@ -78,8 +78,8 @@ function ChatBox() {
                                 >
                                     <div
                                         className={`inline-block p-3 rounded-lg max-w-[80%] ${msg.role === 'user'
-                                                ? 'bg-pink-500 text-white rounded-br-none'
-                                                : 'bg-gray-200 text-gray-800 rounded-bl-none'
+                                            ? 'bg-pink-500 text-white rounded-br-none'
+                                            : 'bg-gray-200 text-gray-800 rounded-bl-none'
                                             }`}
                                     >
                                         {msg.content}
