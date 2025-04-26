@@ -31,12 +31,8 @@ cd <repository-folder>
 ```
 
 ### 2. Backend Setup
-1. **Navigate to the backend directory** (if applicable, or stay in the root if backend files are there):
-   ```bash
-   cd backend
-   ```
 
-2. **Create a virtual environment** (optional but recommended):
+1. **Create a virtual environment** (optional but recommended):
    - Download and install Anaconda from [https://www.anaconda.com/products/distribution](https://www.anaconda.com/products/distribution).
    - Follow the installation instructions for your operating system (Windows, macOS, or Linux).
    - Verify the installation by running:
@@ -48,9 +44,14 @@ cd <repository-folder>
      conda update conda
      ```
    - Create a virtual environment
+     ```bash
+     conda create -n backend_env python=3.9
+     conda activate backend_env
+     ```
+
+2. **Navigate to the backend directory** (if applicable, or stay in the root if backend files are there):
    ```bash
-   conda create -n backend_env python=3.9
-   conda activate backend_env
+   cd backend
    ```
 
 3. **Install Python dependencies**:
