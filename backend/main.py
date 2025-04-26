@@ -34,38 +34,9 @@ else:
 pipe = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", torch_dtype=torch.float16)
 pipe.to("cuda" if torch.cuda.is_available() else "cpu")
 
-# Load CLIP model for text-image retrieval
-clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
-clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
-
-# Load precomputed image database
-with open("image_db.pkl", "rb") as f:
-    image_paths, image_embeddings = pickle.load(f)
-
-# Convert embeddings to torch tensor
-image_embeddings = torch.tensor(image_embeddings)
-
 # Request model
 class PromptRequest(BaseModel):
     prompt: str
-
-
-from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
-# Load TinyLlama model & tokenizer
-model_id = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
-tokenizer = AutoTokenizer.from_pretrained(model_id)
-model = AutoModelForCausalLM.from_pretrained(
-    model_id,
-    torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-    device_map="auto"
-)
-
-# Build chat pipeline
-llm_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer)
-
-# Request model
-class ChatRequest(BaseModel):
-    history: list  # List of {"role": "user"/"assistant", "content": "text"}
 
 @app.post("/generate-image")
 async def generate_image(request: PromptRequest):
@@ -77,6 +48,17 @@ async def generate_image(request: PromptRequest):
     img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
     return {"image_base64": img_str}
+
+# Load CLIP model for text-image retrieval
+clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+
+# Load precomputed image database
+with open("image_db.pkl", "rb") as f:
+    image_paths, image_embeddings = pickle.load(f)
+
+# Convert embeddings to torch tensor
+image_embeddings = torch.tensor(image_embeddings)
 
 @app.post("/search-image")
 async def search_image(request: PromptRequest):
@@ -104,10 +86,28 @@ async def search_image(request: PromptRequest):
 
     return {"image_base64": img_str}
 
+
+from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+# Load TinyLlama model & tokenizer
+model_id = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+model = AutoModelForCausalLM.from_pretrained(
+    model_id,
+    torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+    device_map="auto"
+)
+
+# Build chat pipeline
+llm_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer)
+
+# Request model
+class ChatRequest(BaseModel):
+    history: list  # List of {"role": "user"/"assistant", "content": "text"}
+
 @app.post("/chat-orchid")
 async def chat_orchid(request: ChatRequest):
     # Build the prompt from history
-    prompt = "### Instruction:\nYou are an expert on orchids (hoa phong lan). Please answer only questions about orchids carefully and helpfully.\n\n"
+    prompt = "### Instruction:\nYou are an expert on flowers. Please answer only questions about flowers carefully and helpfully.\n\n"
     for turn in request.history:
         if turn["role"] == "user":
             prompt += f"### Question:\n{turn['content']}\n"

@@ -1,14 +1,7 @@
 import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import SearchBar from '../components/SearchBar';
-
-// Import sample images from assets
-import flower1 from '../assets/images/1.jpg';
-import flower2 from '../assets/images/2.jpg';
-import flower3 from '../assets/images/3.jpg';
-import flower4 from '../assets/images/4.jpg';
-import flower5 from '../assets/images/5.jpg';
-import flower6 from '../assets/images/1.jpg';
+import { products as productData } from '../data';
 
 function Shop() {
     const [products, setProducts] = useState([]);
@@ -25,75 +18,8 @@ function Shop() {
 
     useEffect(() => {
         // In a real app, this would be an API call
-        const allProducts = [
-            {
-                id: 1,
-                name: 'Rose Bouquet',
-                description: 'A beautiful bouquet of fresh roses in various colors.',
-                price: 49.99,
-                image: flower1,
-                category: 'bouquets'
-            },
-            {
-                id: 2,
-                name: 'Orchid Collection',
-                description: 'Exotic orchids that bring elegance to any space.',
-                price: 59.99,
-                image: flower2,
-                category: 'plants'
-            },
-            {
-                id: 3,
-                name: 'Tulip Arrangement',
-                description: 'Colorful tulips arranged in a stylish vase.',
-                price: 39.99,
-                image: flower3,
-                category: 'arrangements'
-            },
-            {
-                id: 4,
-                name: 'Lily Bouquet',
-                description: 'Fragrant lilies that make a perfect gift.',
-                price: 44.99,
-                image: flower4,
-                category: 'bouquets'
-            },
-            {
-                id: 5,
-                name: 'Single Rose',
-                description: 'A perfect single rose for a romantic gesture.',
-                price: 9.99,
-                image: flower5,
-                category: 'single'
-            },
-            {
-                id: 6,
-                name: 'Succulent Garden',
-                description: 'A collection of beautiful succulents in a decorative pot.',
-                price: 34.99,
-                image: flower6,
-                category: 'plants'
-            },
-            {
-                id: 7,
-                name: 'Sunflower Bouquet',
-                description: 'Bright and cheerful sunflowers to brighten any day.',
-                price: 29.99,
-                image: flower1,
-                category: 'bouquets'
-            },
-            {
-                id: 8,
-                name: 'Mixed Flower Arrangement',
-                description: 'A stunning arrangement of seasonal flowers.',
-                price: 54.99,
-                image: flower3,
-                category: 'arrangements'
-            }
-        ];
-
-        setProducts(allProducts);
-        setFilteredProducts(allProducts);
+        setProducts(productData);
+        setFilteredProducts(productData);
     }, []);
 
     const handleSearch = (results) => {
@@ -117,6 +43,7 @@ function Shop() {
 
                 <div className="mb-8">
                     <SearchBar onSearch={handleSearch} />
+
                 </div>
 
                 <div className="mb-8 overflow-x-auto">

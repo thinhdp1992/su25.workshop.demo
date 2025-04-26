@@ -4,12 +4,7 @@ import Hero from '../components/Hero';
 import SearchBar from '../components/SearchBar';
 import ProductCard from '../components/ProductCard';
 import ChatBox from '../components/ChatBox';
-
-// Import sample images from assets
-import flower1 from '../assets/images/1.jpg';
-import flower2 from '../assets/images/2.jpg';
-import flower3 from '../assets/images/3.jpg';
-import flower4 from '../assets/images/4.jpg';
+import { products } from '../data';
 
 function Home() {
     const [searchResults, setSearchResults] = useState(null);
@@ -17,36 +12,10 @@ function Home() {
 
     useEffect(() => {
         // In a real app, this would be an API call
-        setFeaturedProducts([
-            {
-                id: 1,
-                name: 'Rose Bouquet',
-                description: 'A beautiful bouquet of fresh roses in various colors.',
-                price: 49.99,
-                image: flower1
-            },
-            {
-                id: 2,
-                name: 'Orchid Collection',
-                description: 'Exotic orchids that bring elegance to any space.',
-                price: 59.99,
-                image: flower2
-            },
-            {
-                id: 3,
-                name: 'Tulip Arrangement',
-                description: 'Colorful tulips arranged in a stylish vase.',
-                price: 39.99,
-                image: flower3
-            },
-            {
-                id: 4,
-                name: 'Lily Bouquet',
-                description: 'Fragrant lilies that make a perfect gift.',
-                price: 44.99,
-                image: flower4
-            }
-        ]);
+        const topFeatured = [...products]
+            .sort((a, b) => b.quantity - a.quantity)
+            .slice(0, 4);
+        setFeaturedProducts(topFeatured);
     }, []);
 
     const handleSearch = (results) => {
@@ -67,12 +36,21 @@ function Home() {
                     {searchResults && (
                         <div className="mt-8">
                             <h3 className="text-xl font-semibold mb-4">Search Results</h3>
-                            {/* Display search results here */}
-                            <p className="text-gray-600">
-                                {searchResults.image_base64
-                                    ? "Found matching flowers! Check out our recommendations below."
-                                    : "No matching flowers found. Try a different search term."}
-                            </p>
+
+                            {searchResults.image_base64 ? (
+                                <div className="flex flex-col items-center">
+                                    <img
+                                        src={`data:image/png;base64,${searchResults.image_base64}`}
+                                        alt="Search result"
+                                        className="rounded-lg shadow-lg max-w-xs"
+                                    />
+                                    <p className="text-gray-600 mt-4">Found matching flowers!</p>
+                                </div>
+                            ) : (
+                                <p className="text-gray-600">
+                                    No matching flowers found. Try a different search term.
+                                </p>
+                            )}
                         </div>
                     )}
                 </div>
