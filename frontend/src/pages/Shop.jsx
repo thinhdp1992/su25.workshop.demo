@@ -7,6 +7,7 @@ function Shop() {
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [activeCategory, setActiveCategory] = useState('all');
+    const [searchResults, setSearchResults] = useState(null);
 
     const categories = [
         { id: 'all', name: 'All Flowers' },
@@ -23,6 +24,7 @@ function Shop() {
     }, []);
 
     const handleSearch = (results) => {
+        setSearchResults(results);
         // In a real app, we would process the search results here
         console.log("Search results:", results);
     };
@@ -44,6 +46,26 @@ function Shop() {
                 <div className="mb-8">
                     <SearchBar onSearch={handleSearch} />
 
+                    {searchResults && (
+                        <div className="mt-8">
+                            <h3 className="text-xl font-semibold mb-4">Search Results</h3>
+
+                            {searchResults.image_base64 ? (
+                                <div className="flex flex-col items-center">
+                                    <img
+                                        src={`data:image/png;base64,${searchResults.image_base64}`}
+                                        alt="Search result"
+                                        className="rounded-lg shadow-lg max-w-xs"
+                                    />
+                                    <p className="text-gray-600 mt-4">Found matching flowers!</p>
+                                </div>
+                            ) : (
+                                <p className="text-gray-600">
+                                    No matching flowers found. Try a different search term.
+                                </p>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 <div className="mb-8 overflow-x-auto">
