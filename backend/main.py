@@ -127,4 +127,37 @@ async def chat_flower(request: ChatRequest):
 
     return {"answer": response}
 
+
+from transformers import VisionEncoderDecoderModel, ViTImageProcessor, AutoTokenizer
+
+# Load Image Captioning model
+caption_model_id = "nlpconnect/vit-gpt2-image-captioning"
+caption_model = VisionEncoderDecoderModel.from_pretrained(caption_model_id)
+caption_processor = ViTImageProcessor.from_pretrained(caption_model_id)
+caption_tokenizer = AutoTokenizer.from_pretrained(caption_model_id)
+
+caption_model.to("cuda" if torch.cuda.is_available() else "cpu")
+
+# Request model
+class ImageRequest(BaseModel):
+    image_base64: str  # Image sent as base64 encoded string
+
+@app.post("/caption-image")
+async def caption_image(request: ImageRequest):
+    """Generate a caption for an uploaded image."""
+
+    # Decode base64 to PIL Image
+    image_data = base64.b64decode(request.image_base64)
+    image = Image.open(BytesIO(image_data)).convert("RGB")
+
+    # Preprocess image
+    pixel_values = caption_processor(images=image, return_tensors="pt").pixel_values
+    pixel_values = pixel_values.to("cuda" if torch.cuda.is_available() else "cpu")
+
+    # Generate caption
+    with torch.no_grad():
+        output_ids = caption_model.generate(pixel_values, max_length=50, num_beams=4)
+    caption = caption_tokenizer.decode(output_ids[0], skip_special_tokens=True)
+
+    return {"caption": caption}
 # Run the server with: uvicorn main:app --host 0.0.0.0 --port 8000
