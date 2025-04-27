@@ -123,8 +123,11 @@ cd <repository-folder>
 
 ### 5. Accessing the Application
 - **Web**: Open your browser and navigate to `http://localhost:5173` to access the web frontend.
-- **Mobile**: Use the Expo Go app on your device or run the app on an emulator/simulator.
-- The frontend should connect to the backend at `http://localhost:8000` for API calls.
+- **Mobile**:
+  - **On an Emulator/Simulator**:
+    - **Android Emulator**: Use the Expo Go app or run the app on an Android emulator. Since the emulator cannot access `localhost` directly, ensure the `EXPO_PUBLIC_API_URL` in `app.json` is set to `http://10.0.2.2:8000`. Alternatively, find your computer's IP address using `ipconfig` (Windows) or `ifconfig` (macOS/Linux) and update `EXPO_PUBLIC_API_URL` to `http://<your-computer-ip>:8000`.
+    - **iOS Simulator**: Use the Expo Go app or run the app on an iOS simulator. The iOS simulator can typically access `localhost`, so `http://localhost:8000` should work. If it doesn't, use your computer's IP address as described above.
+  - **On a Physical Device**: Scan the QR code with the Expo Go app on your iOS/Android device. Update `EXPO_PUBLIC_API_URL` to use your computer's IP address (e.g., `http://192.168.1.x:8000`), as physical devices cannot access `localhost` on your computer.
 
 ## API Endpoints
 The backend provides the following endpoints:
