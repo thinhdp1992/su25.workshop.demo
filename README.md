@@ -15,7 +15,7 @@ This project is a full-stack application that provides functionalities for gener
 
 ## Prerequisites
 Before running the project, ensure you have the following installed:
-- Python 3.8+
+- Python 3.9+
 - Node.js 16+
 - Git
 - CUDA-compatible GPU (optional, for faster image generation)
@@ -31,15 +31,27 @@ cd <repository-folder>
 ```
 
 ### 2. Backend Setup
-1. **Navigate to the backend directory** (if applicable, or stay in the root if backend files are there):
+
+1. **Create a virtual environment** (optional but recommended):
+   - Download and install Anaconda from [https://www.anaconda.com/products/distribution](https://www.anaconda.com/products/distribution).
+   - Follow the installation instructions for your operating system (Windows, macOS, or Linux).
+   - Verify the installation by running:
+     ```bash
+     conda --version
+     ```
+   - Update Anaconda to the latest version:
+     ```bash
+     conda update conda
+     ```
+   - Create a virtual environment
+     ```bash
+     conda create -n backend_env python=3.9
+     conda activate backend_env
+     ```
+
+2. **Navigate to the backend directory** (if applicable, or stay in the root if backend files are there):
    ```bash
    cd backend
-   ```
-
-2. **Create a virtual environment** (optional but recommended):
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
 3. **Install Python dependencies**:
@@ -88,7 +100,7 @@ cd <repository-folder>
 ## API Endpoints
 The backend provides the following endpoints:
 1. **POST `/generate-image`**:
-   - **Request Body**: `{ "prompt": "A beautiful flower flower" }`
+   - **Request Body**: `{ "prompt": "A beautiful flower" }`
    - **Response**: `{ "image_base64": "<base64-encoded-image>" }`
    - Generates a new flower image based on the provided text prompt.
 
