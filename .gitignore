@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 
 frontend/.env
+frontend.mobile/.env
