@@ -40,7 +40,7 @@ export default function GenerateImageScreen() {
             });
 
             const data = await response.json();
-            console.log(data)
+            // console.log(data)
 
             if (data.image_url) {
                 setGeneratedImage(data.image_url);
