@@ -68,7 +68,7 @@ cd <repository-folder>
    ```
    The backend will be available at `http://localhost:8000`.
 
-### 3. Frontend Setup
+### 3. Web Frontend Setup
 1. **Navigate to the frontend directory** (if applicable, or stay in the root if frontend files are there):
    ```bash
    cd frontend.web
@@ -134,7 +134,7 @@ The backend provides the following endpoints:
    - Searches for the most similar existing flower image based on the text prompt.
 
 3. **POST `/chat-flower`**:
-   - **Request Body**: `{ "history": [{ "role": "user", "content": "What is an flower?" }, { "role": "assistant", "content": "An flower is..." }] }`
+   - **Request Body**: `{ "history": [{ "role": "user", "content": "What is a flower?" }, { "role": "assistant", "content": "A flower is..." }] }`
    - **Response**: `{ "answer": "Response about flowers" }`
    - Interacts with the flower-specialized chatbot.
 

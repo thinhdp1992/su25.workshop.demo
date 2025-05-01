@@ -116,7 +116,7 @@ async def chat_flower(request: ChatRequest):
     prompt += "### Answer:\n"
 
     # Generate answer
-    output = llm_pipeline(prompt, max_new_tokens=200, temperature=0.7, do_sample=True)
+    output = llm_pipeline(prompt, max_new_tokens=300, temperature=0.0, do_sample=True)
     full_text = output[0]["generated_text"]
 
     # Extract the latest answer

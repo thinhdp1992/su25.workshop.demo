@@ -32,6 +32,7 @@ function ChatBox() {
             });
 
             const data = await res.json();
+            console.log(data);
             setHistory([...newHistory, { role: "assistant", content: data.answer }]);
         } catch (error) {
             console.error("Chat error:", error);
