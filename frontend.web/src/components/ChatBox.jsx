@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 function ChatBox() {
     const [isOpen, setIsOpen] = useState(false);
@@ -83,7 +84,7 @@ function ChatBox() {
                                             : 'bg-gray-200 text-gray-800 rounded-bl-none'
                                             }`}
                                     >
-                                        {msg.content}
+                                        <ReactMarkdown>{msg.content}</ReactMarkdown>
                                     </div>
                                 </div>
                             ))

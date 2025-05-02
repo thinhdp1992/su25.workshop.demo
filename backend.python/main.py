@@ -30,6 +30,7 @@ if torch.cuda.is_available():
 else:
     print("Using CPU")
 
+### Generate Image ###
 # Load Stable Diffusion model
 pipe = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", torch_dtype=torch.float16)
 pipe.to("cuda" if torch.cuda.is_available() else "cpu")
@@ -49,6 +50,8 @@ async def generate_image(request: PromptRequest):
 
     return {"image_base64": img_str}
 
+
+### Text to Image Retrieval ###
 # Load CLIP model for text-image retrieval
 clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
 clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
@@ -86,19 +89,18 @@ async def search_image(request: PromptRequest):
 
     return {"image_base64": img_str}
 
+### Question Answering ###
 
-from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
-# Load TinyLlama model & tokenizer
-model_id = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
-tokenizer = AutoTokenizer.from_pretrained(model_id)
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+# Load Qwen3 model and tokenizer
+model_name = "Qwen/Qwen3-0.6B"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(
-    model_id,
+    model_name,
     torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
     device_map="auto"
 )
-
-# Build chat pipeline
-llm_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
 # Request model
 class ChatRequest(BaseModel):
@@ -106,28 +108,47 @@ class ChatRequest(BaseModel):
 
 @app.post("/chat-flower")
 async def chat_flower(request: ChatRequest):
-    # Build the prompt from history
-    prompt = "### Instruction:\nYou are an expert on flowers. Please answer only questions about flowers carefully and helpfully.\n\n"
+    # Prepend system instruction
+    messages = [{"role": "system", "content": "You are an expert on flowers. Only answer questions about flowers."}]
+    
+    # Add chat history
     for turn in request.history:
-        if turn["role"] == "user":
-            prompt += f"### Question:\n{turn['content']}\n"
-        elif turn["role"] == "assistant":
-            prompt += f"### Answer:\n{turn['content']}\n"
-    prompt += "### Answer:\n"
+        messages.append({"role": turn["role"], "content": turn["content"]})
+    
+    # Add generation prompt
+    prompt = tokenizer.apply_chat_template(
+        messages,
+        tokenize=False,
+        add_generation_prompt=True,
+        enable_thinking=True
+    )
 
-    # Generate answer
-    output = llm_pipeline(prompt, max_new_tokens=300, temperature=0.0, do_sample=True)
-    full_text = output[0]["generated_text"]
+    # Tokenize input
+    model_inputs = tokenizer([prompt], return_tensors="pt").to(model.device)
 
-    # Extract the latest answer
-    if "### Answer:" in full_text:
-        response = full_text.split("### Answer:")[-1].strip()
-    else:
-        response = full_text.strip()
+    # Generate output
+    generated_ids = model.generate(
+        **model_inputs,
+        max_new_tokens=1024,
+        temperature=0.0,
+        do_sample=False
+    )
+    
+    output_ids = generated_ids[0][len(model_inputs.input_ids[0]):].tolist()
 
-    return {"answer": response}
+    # Try to split thinking content and final content
+    try:
+        end_think = len(output_ids) - output_ids[::-1].index(151668)  # </think>
+    except ValueError:
+        end_think = 0
+
+    thinking_content = tokenizer.decode(output_ids[:end_think], skip_special_tokens=True).strip()
+    final_content = tokenizer.decode(output_ids[end_think:], skip_special_tokens=True).strip()
+
+    return {"answer": final_content}
 
 
+### Image Captioning ###
 from transformers import VisionEncoderDecoderModel, ViTImageProcessor, AutoTokenizer
 
 # Load Image Captioning model
