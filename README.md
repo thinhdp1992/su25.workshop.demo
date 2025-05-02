@@ -104,7 +104,14 @@ cd <repository-folder>
    npm install
    ```
 
-3. **Run the mobile app**:
+4. **Configure environment variables**:
+   - Create a `.env` file in the frontend.mobile directory.
+   - Add the backend API endpoint:
+     ```
+     EXPO_PUBLIC_API_URL=<your-computer-ip>:8000 (e.g., http://192.168.1.10:8000)
+     ```
+
+5. **Run the mobile app**:
    Start the Expo development server:
    ```bash
    npm start
