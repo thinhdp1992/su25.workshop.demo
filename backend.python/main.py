@@ -30,76 +30,18 @@ if torch.cuda.is_available():
 else:
     print("Using CPU")
 
-### Generate Image ###
-# Load Stable Diffusion model
-pipe = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", torch_dtype=torch.float16)
-pipe.to("cuda" if torch.cuda.is_available() else "cpu")
-
-# Request model
-class PromptRequest(BaseModel):
-    prompt: str
-
-@app.post("/generate-image")
-async def generate_image(request: PromptRequest):
-    """Generate a new image from text using Stable Diffusion."""
-    image = pipe(request.prompt).images[0]
-
-    buffered = BytesIO()
-    image.save(buffered, format="PNG")
-    img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-
-    return {"image_base64": img_str}
 
 
-### Text to Image Retrieval ###
-# Load CLIP model for text-image retrieval
-clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
-clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
-
-# Load precomputed image database
-with open("image_db.pkl", "rb") as f:
-    image_paths, image_embeddings = pickle.load(f)
-
-# Convert embeddings to torch tensor
-image_embeddings = torch.tensor(image_embeddings)
-
-@app.post("/search-image")
-async def search_image(request: PromptRequest):
-    """Search for the most similar existing image based on a text prompt."""
-    # Encode the prompt text into an embedding
-    inputs = clip_processor(text=[request.prompt], return_tensors="pt", padding=True)
-    with torch.no_grad():
-        text_features = clip_model.get_text_features(**inputs)
-
-    # Normalize the embedding
-    text_features = text_features / text_features.norm(p=2, dim=-1, keepdim=True)
-
-    # Compute cosine similarity between text and image embeddings
-    similarity = (text_features @ image_embeddings.T)[0]
-
-    # Find the index of the most similar image
-    best_idx = similarity.argmax().item()
-    best_image_path = image_paths[best_idx]
-
-    # Load and convert the image to base64
-    image = Image.open(best_image_path).convert("RGB")
-    buffered = BytesIO()
-    image.save(buffered, format="PNG")
-    img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-
-    return {"image_base64": img_str}
 
 ### Question Answering ###
-
 from transformers import AutoModelForCausalLM, AutoTokenizer
-
 # Load Qwen3 model and tokenizer
 model_name = "Qwen/Qwen3-0.6B"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(
     model_name,
     torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-    device_map="auto"
+    device_map="cuda" if torch.cuda.is_available() else "cpu"
 )
 
 # Request model
@@ -130,7 +72,7 @@ async def chat_flower(request: ChatRequest):
     generated_ids = model.generate(
         **model_inputs,
         max_new_tokens=1024,
-        temperature=0.0,
+        temperature=0.7,
         do_sample=False
     )
     
@@ -146,6 +88,73 @@ async def chat_flower(request: ChatRequest):
     final_content = tokenizer.decode(output_ids[end_think:], skip_special_tokens=True).strip()
 
     return {"answer": final_content}
+
+
+
+
+### Text to Image Retrieval ###
+# Load CLIP model for text-image retrieval
+clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+
+# Load precomputed image database
+with open("image_db.pkl", "rb") as f:
+    image_paths, image_embeddings = pickle.load(f)
+
+# Convert embeddings to torch tensor
+image_embeddings = torch.tensor(image_embeddings)
+
+# Request model
+class PromptRequest(BaseModel):
+    prompt: str
+
+@app.post("/search-image")
+async def search_image(request: PromptRequest):
+    """Search for the most similar existing image based on a text prompt."""
+    # Encode the prompt text into an embedding
+    inputs = clip_processor(text=[request.prompt], return_tensors="pt", padding=True)
+    with torch.no_grad():
+        text_features = clip_model.get_text_features(**inputs)
+
+    # Normalize the embedding
+    text_features = text_features / text_features.norm(p=2, dim=-1, keepdim=True)
+
+    # Compute cosine similarity between text and image embeddings
+    similarity = (text_features @ image_embeddings.T)[0]
+
+    # Find the index of the most similar image
+    best_idx = similarity.argmax().item()
+    best_image_path = image_paths[best_idx]
+
+    # Load and convert the image to base64
+    image = Image.open(best_image_path).convert("RGB")
+    buffered = BytesIO()
+    image.save(buffered, format="PNG")
+    img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+    return {"image_base64": img_str}
+
+
+
+
+### Generate Image ###
+# Load Stable Diffusion model
+pipe = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", 
+    torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32)
+pipe.to("cuda" if torch.cuda.is_available() else "cpu")
+
+@app.post("/generate-image")
+async def generate_image(request: PromptRequest):
+    """Generate a new image from text using Stable Diffusion."""
+    image = pipe(request.prompt).images[0]
+
+    buffered = BytesIO()
+    image.save(buffered, format="PNG")
+    img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+    return {"image_base64": img_str}
+
+
 
 
 ### Image Captioning ###
